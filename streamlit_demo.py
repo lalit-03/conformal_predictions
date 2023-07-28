@@ -15,6 +15,12 @@ from model import MLP, CNN
 torch.manual_seed(42)
 np.random.seed(42)
 
+@st.cache
+def load_cnn():
+    net = CNN()
+    net.load_state_dict(torch.load("cifar/cifar_model", map_location=torch.device("cpu")))
+    return net
+
 # Define the main function to create the Streamlit app
 def main():
     # Set the title and subheader of the app
@@ -101,8 +107,11 @@ def main():
     st.write("In Classification, our model outputs are now class probabilities and prediction sets are discrete.")
     # Further explanations and information about the Cifar Dataset and the pre-trained CNN model
     X_test, y_test, X_calib, y_calib = get_data()
-    net = CNN()
-    net.load_state_dict(torch.load("cifar/cifar_model", map_location=torch.device("cpu")))
+    # net = CNN()
+    # net.load_state_dict(torch.load("cifar/cifar_model", map_location=torch.device("cpu")))
+    
+    net = load_cnn()
+    
     st.write("**Test accuracy** of current model:", get_test_accuracy(X_test, y_test, net))
     st.write("The choice of how to calculate conformity scores is a modelling decision. We will use a simple softmax based method:")
     score_func = r"s_i=1-\hat{\pi}_{x_i}(y_i)"
